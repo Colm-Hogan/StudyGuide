@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheatSheetGen - Fixed & Compact</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #312e81;
+      --bg-color: #f8fafc;
+      --border-color: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-color); min-height: 100vh; color: #1e293b; }
+    
+    /* --- SCREEN STYLES --- */
+    .app-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1.25rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon { background: var(--primary); color: white; padding: 0.5rem; border-radius: 0.75rem; }
+    .logo h1 { font-size: 1.25rem; font-weight: 900; color: #1e293b; }
+    .logo p { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; }
+    
+    .class-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 0.75rem; }
+    .class-toggle button { padding: 0.5rem 1.5rem; border: none; background: transparent; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; border-radius: 0.5rem; transition: all 0.2s; }
+    .class-toggle button.active { background: white; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    
+    .main-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+    
+    .panel { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: fit-content; }
+    .panel-title { display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+    
+    label { display: block; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #94a3b8; margin-bottom: 0.25rem; margin-top: 1rem; }
+    label:first-of-type { margin-top: 0; }
+    select { width: 100%; padding: 0.75rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 0.75rem; font-size: 14px; }
+    
+    .tables-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; margin-top: 1rem; }
+    
+    /* Updated Toggle Styles */
+    .type-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 0.5rem; border: 1px solid var(--border-color); }
+    .type-toggle button { padding: 8px 16px; border: none; background: transparent; font-size: 16px; font-weight: 900; color: #94a3b8; cursor: pointer; border-radius: 0.25rem; transition: all 0.2s; }
+    .type-toggle button.active { background: white; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    
+    /* Updated Grid Buttons */
+    .tables-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; margin-bottom: 0.75rem; }
+    .table-btn { padding: 0.75rem 0.25rem; font-size: 13px; font-weight: 700; border: 1px solid var(--border-color); background: white; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; margin: 2px; /* 0.5mm margin */ }
+    .table-btn:hover { border-color: var(--primary); background: #f8fafc; }
+    .table-btn.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
+    
+    .selected-tables { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 1rem; }
+    .selected-tag { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: #eef2ff; color: var(--primary); border-radius: 0.25rem; font-size: 9px; font-weight: 700; border: 1px solid #c7d2fe; }
+    .selected-tag button { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 12px; line-height: 1; }
+    
+    .generate-btn { width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 0.75rem; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; margin-top: 1rem; }
+    .generate-btn:hover { background: #4338ca; }
+    
+    .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .preview-header h2 { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #64748b; }
+    .print-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.5rem; background: #1e293b; color: white; border: none; border-radius: 0.75rem; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .print-btn:hover { background: #0f172a; }
+    
+    .preview-area { min-height: 600px; background: white; border-radius: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 2.5rem; border: 1px solid #f1f5f9; }
+    
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 500px; color: #cbd5e1; text-align: center; }
+    .empty-state p { font-size: 18px; font-weight: 900; text-transform: uppercase; color: #94a3b8; margin-top: 1rem; }
+    .empty-state span { font-size: 12px; color: #94a3b8; margin-top: 0.5rem; }
+    
+    /* --- SHEET STYLES (Shared) --- */
+    .sheet { display: none; }
+    .sheet.visible { display: block; }
+    .sheet-header { text-align: center; border-bottom: 4px double #e0e7ff; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .sheet-header h1 { font-size: 1.75rem; font-weight: 900; text-transform: uppercase; color: var(--primary-dark); }
+    .sheet-header .week { font-size: 14px; font-weight: 700; color: #6366f1; margin-top: 0.5rem; }
+    
+    .section { margin-bottom: 2rem; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #6366f1; padding-bottom: 0.25rem; margin-bottom: 0.75rem; }
+    .section-header h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--primary-dark); }
+    .section-header .badge { font-size: 10px; font-weight: 700; color: #6366f1; background: #eef2ff; padding: 0.25rem 0.5rem; border-radius: 0.25rem; text-transform: uppercase; }
+    
+    .spellings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .spelling-box { border: 1px solid #e0e7ff; border-radius: 1rem; overflow: hidden; background: #fafbff; }
+    .spelling-box .hint { background: var(--primary); color: white; font-size: 10px; font-weight: 700; text-align: center; padding: 0.5rem; text-transform: uppercase; }
+    .spelling-box .words { padding: 1rem; text-align: center; }
+    .spelling-box .words div { font-size: 12px; font-weight: 500; margin-bottom: 0.25rem; }
+    
+    .verb-card { border: 2px solid #e0e7ff; border-radius: 1.5rem; overflow: hidden; }
+    .verb-card .verb-header { background: var(--primary-dark); color: white; padding: 1rem; text-align: center; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
+    .verb-3rd .verb-body { padding: 2rem; text-align: center; }
+    .verb-3rd .tense-label { font-size: 10px; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #e0e7ff; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+    .verb-3rd .conjugations div { font-size: 14px; font-weight: 700; font-style: italic; color: #475569; margin-bottom: 0.25rem; }
+    
+    .verb-5th .verb-body { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .verb-5th .tense-col { padding: 1rem; border-right: 2px solid #e0e7ff; }
+    .verb-5th .tense-col:last-child { border-right: none; }
+    .verb-5th .tense-label { font-size: 9px; font-weight: 900; color: #6366f1; text-transform: uppercase; text-align: center; border-bottom: 1px solid #e0e7ff; padding-bottom: 0.25rem; margin-bottom: 0.75rem; }
+    .verb-5th .conjugations { text-align: center; }
+    .verb-5th .conjugations div { font-size: 11px; font-weight: 700; font-style: italic; color: #475569; margin-bottom: 0.125rem; }
+    .verb-5th .qa-box { margin-top: 0.75rem; padding: 0.5rem; background: #f5f3ff; border-radius: 0.5rem; font-size: 10px; }
+    .verb-5th .qa-box div { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+    .verb-5th .qa-box .label { font-weight: 700; margin-right: 4px; }
+    .verb-5th .qa-box .q { color: #6366f1; font-style: italic; }
+    
+    .translation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .translation-box { border: 2px solid #e0e7ff; border-radius: 1rem; overflow: hidden; }
+    .translation-header { display: grid; grid-template-columns: 1fr 1fr; background: var(--primary-dark); color: white; }
+    .translation-header div { padding: 0.5rem; text-align: center; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+    .translation-row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #e0e7ff; }
+    .translation-row:last-child { border-bottom: none; }
+    .translation-row:nth-child(even) { background: #f8fafc; }
+    .translation-row div { padding: 0.5rem; font-size: 11px; color: #475569; }
+    .translation-row .irish { font-weight: 700; color: var(--primary-dark); }
+
+    .maths-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .maths-box { border: 2px solid #f1f5f9; border-radius: 1rem; overflow: hidden; text-align: center; background: #fafbfc; }
+    .maths-box .maths-header { background: #1e293b; color: white; font-size: 10px; font-weight: 900; padding: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .maths-box .equations { padding: 1rem; font-family: ui-monospace, monospace; font-size: 12px; color: #475569; }
+    .maths-box .equations div { margin-bottom: 0.125rem; }
+    
+    /* --- PRINT STYLES (SCALED TO FILL PAGE) --- */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; margin: 0; padding: 0; }
+      .no-print { display: none !important; }
+      
+      .sheet { display: block !important; width: 100%; margin: 0 auto; padding: 0; }
+      /* 5mm margin to ensure it prints close to edge but safely */
+      @page { size: A4; margin: 5mm; }
+      
+      /* Headers - Scaled Up */
+      .sheet-header { border-bottom: 2px solid #312e81; padding-bottom: 10px; margin-bottom: 15px; }
+      .sheet-header h1 { font-size: 24px; margin: 0; color: #312e81; }
+      .sheet-header .week { font-size: 14px; margin: 0; color: #6366f1; }
+      
+      /* Sections */
+      .section { margin-bottom: 14px; break-inside: avoid; }
+      .section-header { border-bottom: 2px solid #6366f1; padding-bottom: 4px; margin-bottom: 10px; }
+      .section-header h3 { font-size: 14px; color: #312e81; }
+      .section-header .badge { background-color: #eef2ff !important; color: #6366f1; padding: 3px 8px; font-size: 10px; }
+      
+      /* Spellings - Scaled Up */
+      .spellings-grid { gap: 8px; }
+      .spelling-box { border: 1px solid #e0e7ff; border-radius: 6px; background-color: #fafbff !important; }
+      .spelling-box .hint { background-color: #4f46e5 !important; color: white !important; padding: 5px; font-size: 11px; }
+      .spelling-box .words { padding: 8px; }
+      .spelling-box .words div { font-size: 12px; line-height: 1.3; margin: 0; }
+      
+      /* Verbs - Scaled Up */
+      .verb-card { border: 1px solid #e0e7ff; border-radius: 6px; }
+      .verb-card .verb-header { background-color: #312e81 !important; color: white !important; padding: 6px; font-size: 12px; }
+      .verb-3rd .verb-body { padding: 10px; }
+      .verb-3rd .tense-label { font-size: 12px; margin-bottom: 8px; border-bottom: 1px solid #e0e7ff; }
+      .verb-3rd .conjugations div { font-size: 12px; margin: 0; }
+      
+      .verb-5th .tense-col { padding: 8px; border-right: 1px solid #e0e7ff; }
+      .verb-5th .tense-label { font-size: 11px; margin-bottom: 4px; color: #6366f1; }
+      .verb-5th .conjugations div { font-size: 11px; margin: 0; line-height: 1.25; }
+      .verb-5th .qa-box { background-color: #f5f3ff !important; padding: 5px; margin-top: 5px; font-size: 10px; }
+      
+      /* Extras Grid (Side by Side) - Scaled Up */
+      .extras-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .translation-box { border: 1px solid #e0e7ff; border-radius: 6px; }
+      .translation-header div { background-color: #312e81 !important; color: white !important; padding: 5px; font-size: 10px; }
+      .translation-row div { padding: 4px 8px; font-size: 11px; line-height: 1.3; }
+      .translation-row:nth-child(even) { background-color: #f8fafc !important; }
+      
+      /* Maths Compact - Scaled Up */
+      .maths-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+      .maths-box { border: 1px solid #f1f5f9; border-radius: 6px; background-color: #fafbfc !important; }
+      .maths-box .maths-header { background-color: #1e293b !important; color: white !important; padding: 4px; font-size: 10px; }
+      .maths-box .equations { padding: 4px; }
+      .maths-box .equations div { font-size: 10px; margin: 0; line-height: 1.25; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container no-print">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div>
+          <h1>CheatSheetGen</h1>
+          <p>Study Sheet Generator</p>
+        </div>
+      </div>
+      <div class="class-toggle">
+        <button id="btn3rd" class="active" onclick="setClass('3rd')">3rd Class</button>
+        <button id="btn5th" onclick="setClass('5th')">5th Class</button>
+      </div>
+    </header>
+    
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Selection Database
+        </div>
+        
+        <label>1. Select English Week</label>
+        <select id="weekSelect"><option value="">Choose a week...</option></select>
+        
+        <label>2. Select Irish Verb</label>
+        <select id="verbSelect"><option value="">Choose a verb...</option></select>
+
+        <div id="litriuSection" style="display:none;">
+            <label>3. Select Litriú (Irish Spellings)</label>
+            <select id="litriuSelect"><option value="">Choose a week...</option></select>
+        </div>
+
+        <div id="frasaiSection" style="display:none;">
+            <label>4. Select Frásaí (Phrases)</label>
+            <select id="frasaiSelect"><option value="">Choose a week...</option></select>
+        </div>
+        
+        <div class="tables-header">
+          <label style="margin:0">5. Select Tables</label>
+          <div class="type-toggle">
+            <button id="btnMultiply" class="active" onclick="setMathsType('multiply')">×</button>
+            <button id="btnDivide" onclick="setMathsType('divide')">÷</button>
+          </div>
+        </div>
+        <div class="tables-grid" id="tablesGrid"></div>
+        <div class="selected-tables" id="selectedTables"></div>
+        
+        <button class="generate-btn" onclick="generateSheet()">Generate Sheet</button>
+      </div>
+      
+      <div>
+        <div class="preview-header">
+          <h2>Document Preview</h2>
+          <button class="print-btn" id="printBtn" style="display:none" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print A4
+          </button>
+        </div>
+        <div class="preview-area">
+          <div class="empty-state" id="emptyState">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <p>No Sheet Selected</p>
+            <span>Use the selection database to build your weekly cheat sheet.</span>
+          </div>
+          <div class="sheet" id="sheetPreview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="sheet" id="sheetPrint"></div>
+
+<script>
+// --- DATA DEFINITIONS ---
+const VERB_LIBRARY = {
+  "Abair": { name: "Abair", trans: "To Say", classification: "Irregular", past: ["Dúirt mé", "Dúirt tú", "Dúirt sé", "Dúirt sí", "Dúramar", "Dúirt sibh", "Dúirt siad"], pastQA: { q: "An ndúirt?", pos: "Dúirt", neg: "Ní dúirt" }, present: ["Deirim", "Deir tú", "Deir sé", "Deir sí", "Deirimid", "Deir sibh", "Deir siad"], presentQA: { q: "An ndeir?", pos: "Deir", neg: "Ní deir" }, future: ["Déarfaidh mé", "Déarfaidh tú", "Déarfaidh sé", "Déarfaidh sí", "Déarfaimid", "Déarfaidh sibh", "Déarfaidh siad"], futureQA: { q: "An ndéarfaidh?", pos: "Déarfaidh", neg: "Ní déarfaidh" } },
+  "Aistrigh": { name: "Aistrigh", trans: "To Translate", classification: "Slender (Caol)", past: ["D'aistrigh mé", "D'aistrigh tú", "D'aistrigh sé", "D'aistrigh sí", "D'aistríomar", "D'aistrigh sibh", "D'aistrigh siad"], pastQA: { q: "Ar aistrigh?", pos: "D'aistrigh", neg: "Níor aistrigh" }, present: ["Aistrím", "Aistríonn tú", "Aistríonn sé", "Aistríonn sí", "Aistrímid", "Aistríonn sibh", "Aistríonn siad"], presentQA: { q: "An n-aistríonn?", pos: "Aistríonn", neg: "Ní aistríonn" }, future: ["Aistreoidh mé", "Aistreoidh tú", "Aistreoidh sé", "Aistreoidh sí", "Aistreoimid", "Aistreoidh sibh", "Aistreoidh siad"], futureQA: { q: "An n-aistreoidh?", pos: "Aistreoidh", neg: "Ní aistreoidh" } },
+  "Bailigh": { name: "Bailigh", trans: "To Collect", classification: "Slender (Caol)", past: ["Bhailigh mé", "Bhailigh tú", "Bhailigh sé", "Bhailigh sí", "Bhailíomar", "Bhailigh sibh", "Bhailigh siad"], pastQA: { q: "Ar bhailigh?", pos: "Bhailigh", neg: "Níor bhailigh" }, present: ["Bailím", "Bailíonn tú", "Bailíonn sé", "Bailíonn sí", "Bailímid", "Bailíonn sibh", "Bailíonn siad"], presentQA: { q: "An mbailíonn?", pos: "Bailíonn", neg: "Ní bhailíonn" }, future: ["Baileoidh mé", "Baileoidh tú", "Baileoidh sé", "Baileoidh sí", "Baileoimid", "Baileoidh sibh", "Baileoidh siad"], futureQA: { q: "An mbaileoidh?", pos: "Baileoidh", neg: "Ní bhaileoidh" } },
+  "Beir": { name: "Beir", trans: "To Catch", classification: "Irregular", past: ["Rug mé", "Rug tú", "Rug sé", "Rug sí", "Rugamar", "Rug sibh", "Rug siad"], pastQA: { q: "Ar rug?", pos: "Rug", neg: "Níor rug" }, present: ["Beirim", "Beireann tú", "Beireann sé", "Beireann sí", "Beirimid", "Beireann sibh", "Beireann siad"], presentQA: { q: "An mbeireann?", pos: "Beireann", neg: "Ní bheireann" }, future: ["Béarfaidh mé", "Béarfaidh tú", "Béarfaidh sé", "Béarfaidh sí", "Béarfaimid", "Béarfaidh sibh", "Béarfaidh siad"], futureQA: { q: "An mbéarfaidh?", pos: "Béarfaidh", neg: "Ní bhéarfaidh" } },
+  "Bí": { name: "Bí", trans: "To Be", classification: "Irregular", past: ["Bhí mé", "Bhí tú", "Bhí sé", "Bhí sí", "Bhíomar", "Bhí sibh", "Bhí siad"], pastQA: { q: "An raibh?", pos: "Bhí", neg: "Ní raibh" }, present: ["Táim", "Tá tú", "Tá sé", "Tá sí", "Táimid", "Tá sibh", "Tá siad"], presentQA: { q: "An bhfuil?", pos: "Tá", neg: "Ní bhfuil" }, future: ["Beidh mé", "Beidh tú", "Beidh sé", "Beidh sí", "Beimid", "Beidh sibh", "Beidh siad"], futureQA: { q: "An mbeidh?", pos: "Beidh", neg: "Ní bheidh" } },
+  "Bris": { name: "Bris", trans: "To Break", classification: "Slender (Caol)", past: ["Bhris mé", "Bhris tú", "Bhris sé", "Bhris sí", "Bhriseamar", "Bhris sibh", "Bhris siad"], pastQA: { q: "Ar bhris?", pos: "Bhris", neg: "Níor bhris" }, present: ["Brisim", "Briseann tú", "Briseann sé", "Briseann sí", "Briseaimid", "Briseann sibh", "Briseann siad"], presentQA: { q: "An mbriseann?", pos: "Briseann", neg: "Ní bhriseann" }, future: ["Brisfidh mé", "Brisfidh tú", "Brisfidh sé", "Brisfidh sí", "Brisfimid", "Brisfidh sibh", "Brisfidh siad"], futureQA: { q: "An mbrisfidh?", pos: "Brisfidh", neg: "Ní bhrisfidh" } },
+  "Ceangail": { name: "Ceangail", trans: "To Tie", classification: "Broad (Leathan)", past: ["Cheangail mé", "Cheangail tú", "Cheangail sé", "Cheangail sí", "Cheanglaíomar", "Cheangail sibh", "Cheangail siad"], pastQA: { q: "Ar cheangail?", pos: "Ceangail", neg: "Níor cheangail" }, present: ["Ceanglaím", "Ceanglaíonn tú", "Ceanglaíonn sé", "Ceanglaíonn sí", "Ceanglaímid", "Ceanglaíonn sibh", "Ceanglaíonn siad"], presentQA: { q: "An gceanglaíonn?", pos: "Ceanglaíonn", neg: "Ní cheanglaíonn" }, future: ["Ceanglóidh mé", "Ceanglóidh tú", "Ceanglóidh sé", "Ceanglóidh sí", "Ceanglóimid", "Ceanglóidh sibh", "Ceanglóidh siad"], futureQA: { q: "An gceanglóidh?", pos: "Ceanglóidh", neg: "Ní gceanglóidh" } },
+  "Ceannaigh": { name: "Ceannaigh", trans: "To Buy", classification: "Broad (Leathan)", past: ["Cheannaigh mé", "Cheannaigh tú", "Cheannaigh sé", "Cheannaigh sí", "Cheannaíomar", "Cheannaigh sibh", "Cheannaigh siad"], pastQA: { q: "Ar cheannaigh?", pos: "Cheannaigh", neg: "Níor cheannaigh" }, present: ["Ceannaím", "Ceannaíonn tú", "Ceannaíonn sé", "Ceannaíonn sí", "Ceannaímid", "Ceannaíonn sibh", "Ceannaíonn siad"], presentQA: { q: "An gceannaíonn?", pos: "Ceannaíonn", neg: "Ní ceannaíonn" }, future: ["Ceannóidh mé", "Ceannóidh tú", "Ceannóidh sé", "Ceannóidh sí", "Ceannóimid", "Ceannóidh sibh", "Ceannóidh siad"], futureQA: { q: "An gceannóidh?", pos: "Ceannóidh", neg: "Ní ceannóidh" } },
+  "Chonaic": { name: "Chonaic (Feic)", trans: "To See", classification: "Irregular", past: ["Chonaic mé", "Chonaic tú", "Chonaic sé", "Chonaic sí", "Chonaiceamar", "Chonaic sibh", "Chonaic siad"], pastQA: { q: "An bhfaca?", pos: "Chonaic", neg: "Ní fhaca" }, present: ["Feicim", "Feiceann tú", "Feiceann sé", "Feiceann sí", "Feicimid", "Feiceann sibh", "Feiceann siad"], presentQA: { q: "An bhfeiceann?", pos: "Feiceann", neg: "Ní fheiceann" }, future: ["Feicfidh mé", "Feicfidh tú", "Feicfidh sé", "Feicfidh sí", "Feicfimid", "Feicfidh sibh", "Feicfidh siad"], futureQA: { q: "An bhfeicfidh?", pos: "Feicfidh", neg: "Ní fheicfidh" } },
+  "Clois": { name: "Clois", trans: "To Hear", classification: "Irregular", past: ["Chuala mé", "Chuala tú", "Chuala sé", "Chuala sí", "Chualamar", "Chuala sibh", "Chuala siad"], pastQA: { q: "Ar chuala?", pos: "Chuala", neg: "Níor chuala" }, present: ["Cloisim", "Cloiseann tú", "Cloiseann sé", "Cloiseann sí", "Cloisimid", "Cloiseann sibh", "Cloiseann siad"], presentQA: { q: "An gcloiseann?", pos: "Cloiseann", neg: "Ní chloiseann" }, future: ["Cloisfidh mé", "Cloisfidh tú", "Cloisfidh sé", "Cloisfidh sí", "Cloisfimid", "Cloisfidh sibh", "Cloisfidh siad"], futureQA: { q: "An gcloisfidh?", pos: "Cloisfidh", neg: "Ní chloisfidh" } },
+  "Críochnaigh": { name: "Críochnaigh", trans: "To Finish", classification: "Broad (Leathan)", past: ["Chríochnaigh mé", "Chríochnaigh tú", "Chríochnaigh sé", "Chríochnaigh sí", "Chríochnaíomar", "Chríochnaigh sibh", "Chríochnaigh siad"], pastQA: { q: "Ar chríochnaigh?", pos: "Chríochnaigh", neg: "Níor chríochnaigh" }, present: ["Críochnaím", "Críochnaíonn tú", "Críochnaíonn sé", "Críochnaíonn sí", "Críochnaímid", "Críochnaíonn sibh", "Críochnaíonn siad"], presentQA: { q: "An gcríochnaím?", pos: "Críochnaíonn", neg: "Ní chríochnaíonn" }, future: ["Críochnóidh mé", "Críochnóidh tú", "Críochnóidh sé", "Críochnóidh sí", "Críochnóimid", "Críochnóidh sibh", "Críochnóidh siad"], futureQA: { q: "An gcríochnóidh?", pos: "Críochnóidh", neg: "Ní gcríochnóidh" } },
+  "Déan": { name: "Déan", trans: "To Do / Make", classification: "Irregular", past: ["Rinne mé", "Rinne tú", "Rinne sé", "Rinne sí", "Rinneamar", "Rinne sibh", "Rinne siad"], pastQA: { q: "An ndearna?", pos: "Rinne", neg: "Ní dhearna" }, present: ["Déanaim", "Déanann tú", "Déanann sé", "Déanann sí", "Déanaimid", "Déanann sibh", "Déanann siad"], presentQA: { q: "An ndéanann?", pos: "Déanann", neg: "Ní dhéanann" }, future: ["Déanfaidh mé", "Déanfaidh tú", "Déanfaidh sé", "Déanfaidh sí", "Déanfaimid", "Déanfaidh sibh", "Déanfaidh siad"], futureQA: { q: "An ndéanfaidh?", pos: "Déanfaidh", neg: "Ní dhéanfaidh" } },
+  "Deisigh": { name: "Deisigh", trans: "To Repair", classification: "Slender (Caol)", past: ["Dheisigh mé", "Dheisigh tú", "Dheisigh sé", "Dheisigh sí", "Dheisíomar", "Dheisigh sibh", "Dheisigh siad"], pastQA: { q: "Ar dheisigh?", pos: "Dheisigh", neg: "Níor dheisigh" }, present: ["Deisím", "Deisíonn tú", "Deisíonn sé", "Deisíonn sí", "Deisímid", "Deisíonn sibh", "Deisíonn siad"], presentQA: { q: "An ndeisíonn?", pos: "Deisíonn", neg: "Ní dheisíonn" }, future: ["Deiseoidh mé", "Deiseoidh tú", "Deiseoidh sé", "Deiseoidh sí", "Deiseoimid", "Deiseoidh sibh", "Deiseoidh siad"], futureQA: { q: "An ndeiseoidh?", pos: "Deiseoidh", neg: "Ní dheiseoidh" } },
+  "Díol": { name: "Díol", trans: "To Sell", classification: "Broad (Leathan)", past: ["Dhíol mé", "Dhíol tú", "Dhíol sé", "Dhíol sí", "Dhíolamar", "Dhíol sibh", "Dhíol siad"], pastQA: { q: "Ar dhíol?", pos: "Dhíol", neg: "Níor dhíol" }, present: ["Díolaim", "Díolann tú", "Díolann sé", "Díolann sí", "Díolaimid", "Díolann sibh", "Díolann siad"], presentQA: { q: "An ndíolann?", pos: "Díolann", neg: "Ní dhíolann" }, future: ["Díolfaidh mé", "Díolfaidh tú", "Díolfaidh sé", "Díolfaidh sí", "Díolfaimid", "Díolfaidh sibh", "Díolfaidh siad"], futureQA: { q: "An ndíolfaidh?", pos: "Díolfaidh", neg: "Ní dhíolfaidh" } },
+  "Dóigh": { name: "Dóigh", trans: "To Burn", classification: "Broad (Leathan)", past: ["Dhóigh mé", "Dhóigh tú", "Dhóigh sé", "Dhóigh sí", "Dhóigheamar", "Dhóigh sibh", "Dhóigh siad"], pastQA: { q: "Ar dhóigh?", pos: "Dhóigh", neg: "Níor dhóigh" }, present: ["Dóim", "Dóann tú", "Dóann sé", "Dóann sí", "Dóimid", "Dóann sibh", "Dóann siad"], presentQA: { q: "An ndóann?", pos: "Dóann", neg: "Ní dhóann" }, future: ["Dófaidh mé", "Dófaidh tú", "Dófaidh sé", "Dófaidh sí", "Dófaimid", "Dófaidh sibh", "Dófaidh siad"], futureQA: { q: "An ndófaidh?", pos: "Dófaidh", neg: "Ní dhófaidh" } },
+  "Dúisigh": { name: "Dúisigh", trans: "To Wake", classification: "Slender (Caol)", past: ["Dhúisigh mé", "Dhúisigh tú", "Dhúisigh sé", "Dhúisigh sí", "Dhúisíomar", "Dhúisigh sibh", "Dhúisigh siad"], pastQA: { q: "Ar dhúisigh?", pos: "Dhúisigh", neg: "Níor dhúisigh" }, present: ["Dúisím", "Dúisíonn tú", "Dúisíonn sé", "Dúisíonn sí", "Dúisímid", "Dúisíonn sibh", "Dúisíonn siad"], presentQA: { q: "An ndúisíonn?", pos: "Dúisíonn", neg: "Ní dhúisíonn" }, future: ["Dúiseoidh mé", "Dúiseoidh tú", "Dúiseoidh sé", "Dúiseoidh sí", "Dúiseoimid", "Dúiseoidh sibh", "Dúiseoidh siad"], futureQA: { q: "An ndúiseoidh?", pos: "Dúiseoidh", neg: "Ní dhúiseoidh" } },
+  "Dún": { name: "Dún", trans: "To Close", classification: "Broad (Leathan)", past: ["Dhún mé", "Dhún tú", "Dhún sé", "Dhún sí", "Dhúnamar", "Dhún sibh", "Dhún siad"], pastQA: { q: "Ar dhún?", pos: "Dhún", neg: "Níor dhún" }, present: ["Dúnaim", "Dúnann tú", "Dúnann sé", "Dúnann sí", "Dúnaimid", "Dúnann sibh", "Dúnann siad"], presentQA: { q: "An ndúnaimid?", pos: "Dúnann", neg: "Ní dhúnann" }, future: ["Dúnfaidh mé", "Dúnfaidh tú", "Dúnfaidh sé", "Dúnfaidh sí", "Dúnfaimid", "Dúnfaidh sibh", "Dúnfaidh siad"], futureQA: { q: "An ndúnfaidh?", pos: "Dúnfaidh", neg: "Ní dhúnfaidh" } },
+  "Faigh": { name: "Faigh", trans: "To Get", classification: "Irregular", past: ["Fuair mé", "Fuair tú", "Fuair sé", "Fuair sí", "Fuaireamar", "Fuair sibh", "Fuair siad"], pastQA: { q: "An bhfuair?", pos: "Fuair", neg: "Ní bhfuair" }, present: ["Faighim", "Faigheann tú", "Faigheann sé", "Faigheann sí", "Faighimid", "Faigheann sibh", "Faigheann siad"], presentQA: { q: "An bhfaigheann?", pos: "Faigheann", neg: "Ní bhfaigheann" }, future: ["Gheobhaidh mé", "Gheobhaidh tú", "Gheobhaidh sé", "Gheobhaidh sí", "Gheobhaimid", "Gheobhaidh sibh", "Gheobhaidh siad"], futureQA: { q: "An bhfaighidh?", pos: "Gheobhaidh", neg: "Ní bhfaighidh" } },
+  "Fág": { name: "Fág", trans: "To Leave", classification: "Broad (Leathan)", past: ["D'fhág mé", "D'fhág tú", "D'fhág sé", "D'fhág sí", "D'fhágamar", "D'fhág sibh", "D'fhág siad"], pastQA: { q: "Ar fhág?", pos: "D'fhág", neg: "Níor fhág" }, present: ["Fágaim", "Fágann tú", "Fágann sé", "Fágann sí", "Fágaimid", "Fágann sibh", "Fágann siad"], presentQA: { q: "An bhfágann?", pos: "Fágann", neg: "Ní bhfágann" }, future: ["Fágfaidh mé", "Fágfaidh tú", "Fágfaidh sé", "Fágfaidh sí", "Fágfaimid", "Fágfaidh sibh", "Fágfaidh siad"], futureQA: { q: "An bhfágfaidh?", pos: "Fágfaidh", neg: "Ní bhfágfaidh" } },
+  "Fan": { name: "Fan", trans: "To Wait", classification: "Broad (Leathan)", past: ["D'fhan mé", "D'fhan tú", "D'fhan sé", "D'fhan sí", "D'fhanamar", "D'fhan sibh", "D'fhan siad"], pastQA: { q: "Ar fhan?", pos: "D'fhan", neg: "Níor fhan" }, present: ["Fanaim", "Fanann tú", "Fanann sé", "Fanann sí", "Fanaimid", "Fanann sibh", "Fanann siad"], presentQA: { q: "An bhfanann?", pos: "Fanann", neg: "Ní bhfanann" }, future: ["Fanfaidh mé", "Fanfaidh tú", "Fanfaidh sé", "Fanfaidh sí", "Fanfaimid", "Fanfaidh sibh", "Fanfaidh siad"], futureQA: { q: "An bhfanfaidh?", pos: "Fanfaidh", neg: "Ní bhfanfaidh" } },
+  "Feic": { name: "Feic", trans: "To See", classification: "Irregular", past: ["Chonaic mé", "Chonaic tú", "Chonaic sé", "Chonaic sí", "Chonaiceamar", "Chonaic sibh", "Chonaic siad"], pastQA: { q: "An bhfaca?", pos: "Chonaic", neg: "Ní fhaca" }, present: ["Feicim", "Feiceann tú", "Feiceann sé", "Feiceann sí", "Feicimid", "Feiceann sibh", "Feiceann siad"], presentQA: { q: "An bhfeiceann?", pos: "Feiceann", neg: "Ní fheiceann" }, future: ["Feicfidh mé", "Feicfidh tú", "Feicfidh sé", "Feicfidh sí", "Feicfimid", "Feicfidh sibh", "Feicfidh siad"], futureQA: { q: "An bhfeicfidh?", pos: "Feicfidh", neg: "Ní fheicfidh" } },
+  "Féach": { name: "Féach", trans: "To Look", classification: "Broad (Leathan)", past: ["D'fhéach mé", "D'fhéach tú", "D'fhéach sé", "D'fhéach sí", "D'fhéachamar", "D'fhéach sibh", "D'fhéach siad"], pastQA: { q: "Ar fhéach?", pos: "D'fhéach", neg: "Níor fhéach" }, present: ["Féachaim", "Féachann tú", "Féachann sé", "Féachann sí", "Féachaimid", "Féachann sibh", "Féachann siad"], presentQA: { q: "An bhféachann?", pos: "Féachann", neg: "Ní bhféachann" }, future: ["Féachfaidh mé", "Féachfaidh tú", "Féachfaidh sé", "Féachfaidh sí", "Féachfaimid", "Féachfaidh sibh", "Féachfaidh siad"], futureQA: { q: "An bhféachfaidh?", pos: "Féachfaidh", neg: "Ní bhféachfaidh" } },
+  "Foghlaim": { name: "Foghlaim", trans: "To Learn", classification: "Broad (Leathan)", past: ["D'fhoghlaim mé", "D'fhoghlaim tú", "D'fhoghlaim sé", "D'fhoghlaim sí", "D'fhoghlaimíomar", "D'fhoghlaim sibh", "D'fhoghlaim siad"], pastQA: { q: "Ar fhoghlaim?", pos: "D'fhoghlaim", neg: "Níor fhoghlaim" }, present: ["Foghlaimím", "Foghlaimíonn tú", "Foghlaimíonn sé", "Foghlaimíonn sí", "Foghlaimímid", "Foghlaimíonn sibh", "Foghlaimíonn siad"], presentQA: { q: "An bhfoghlaimíonn?", pos: "Foghlaimíonn", neg: "Ní bhfoghlaimíonn" }, future: ["Foghlaimeoidh mé", "Foghlaimeoidh tú", "Foghlaimeoidh sé", "Foghlaimeoidh sí", "Foghlaimeoimid", "Foghlaimeoidh sibh", "Foghlaimeoidh siad"], futureQA: { q: "An bhfoghlaimeoidh?", pos: "Foghlaimeoidh", neg: "Ní bhfoghlaimeoidh" } },
+  "Gearr": { name: "Gearr", trans: "To Cut", classification: "Broad (Leathan)", past: ["Ghearr mé", "Ghearr tú", "Ghearr sé", "Ghearr sí", "Ghearramar", "Ghearr sibh", "Ghearr siad"], pastQA: { q: "Ar ghearr?", pos: "Ghearr", neg: "Níor ghearr" }, present: ["Gearraim", "Gearrann tú", "Gearrann sé", "Gearrann sí", "Gearraimid", "Gearrann sibh", "Gearrann siad"], presentQA: { q: "An ngearrann?", pos: "Gearrann", neg: "Ní ghearrann" }, future: ["Gearrfaidh mé", "Gearrfaidh tú", "Gearrfaidh sé", "Gearrfaidh sí", "Gearrfaimid", "Gearrfaidh sibh", "Gearrfaidh siad"], futureQA: { q: "An ngearrfaidh?", pos: "Gearrfaidh", neg: "Ní ngearrfaidh" } },
+  "Glan": { name: "Glan", trans: "To Clean", classification: "Broad (Leathan)", past: ["Ghlan mé", "Ghlan tú", "Ghlan sé", "Ghlan sí", "Ghlanamar", "Ghlan sibh", "Ghlan siad"], pastQA: { q: "Ar ghlan?", pos: "Ghlan", neg: "Níor ghlan" }, present: ["Glanaim", "Glann tú", "Glann sé", "Glann sí", "Glanaimid", "Glann sibh", "Glann siad"], presentQA: { q: "An nglanann?", pos: "Glann", neg: "Ní ghlanann" }, future: ["Glanfaidh mé", "Glanfaidh tú", "Glanfaidh sé", "Glanfaidh sí", "Glanfaimid", "Glanfaidh sibh", "Glanfaidh siad"], futureQA: { q: "An nglanfaidh?", pos: "Glanfaidh", neg: "Ní nglanfaidh" } },
+  "Imigh": { name: "Imigh", trans: "To Leave", classification: "Slender (Caol)", past: ["D'imigh mé", "D'imigh tú", "D'imigh sé", "D'imigh sí", "D'imíomar", "D'imigh sibh", "D'imigh siad"], pastQA: { q: "Ar imigh?", pos: "D'imigh", neg: "Níor imigh" }, present: ["Imím", "Imíonn tú", "Imíonn sé", "Imíonn sí", "Imímid", "Imíonn sibh", "Imíonn siad"], presentQA: { q: "An n-imíonn?", pos: "Imíonn", neg: "Ní imíonn" }, future: ["Imeoidh mé", "Imeoidh tú", "Imeoidh sé", "Imeoidh sí", "Imeoimid", "Imeoidh sibh", "Imeoidh siad"], futureQA: { q: "An n-imeoidh?", pos: "Imeoidh", neg: "Ní imeoidh" } },
+  "Imir": { name: "Imir", trans: "To Play", classification: "Slender (Caol)", past: ["D'imir mé", "D'imir tú", "D'imir sé", "D'imir sí", "D'imreomar", "D'imir sibh", "D'imir siad"], pastQA: { q: "Ar imir?", pos: "D'imir", neg: "Níor imir" }, present: ["Imrím", "Imríonn tú", "Imríonn sé", "Imríonn sí", "Imrímid", "Imríonn sibh", "Imríonn siad"], presentQA: { q: "An n-imríonn?", pos: "Imríonn", neg: "Ní imríonn" }, future: ["Imreoidh mé", "Imreoidh tú", "Imreoidh sé", "Imreoidh sí", "Imreoimid", "Imreoidh sibh", "Imreoidh siad"], futureQA: { q: "An n-imreoidh?", pos: "Imreoidh", neg: "Ní imreoidh" } },
+  "Inis": { name: "Inis", trans: "To Tell", classification: "Slender (Caol)", past: ["D'inis mé", "D'inis tú", "D'inis sé", "D'inis sí", "D'insíomar", "D'inis sibh", "D'inis siad"], pastQA: { q: "Ar inis?", pos: "D'inis", neg: "Níor inis" }, present: ["Insím", "Insíonn tú", "Insíonn sé", "Insíonn sí", "Insímid", "Insíonn sibh", "Insíonn siad"], presentQA: { q: "An n-insíonn?", pos: "Insíonn", neg: "Ní insíonn" }, future: ["Inseoidh mé", "Inseoidh tú", "Inseoidh sé", "Inseoidh sí", "Inseoimid", "Inseoidh sibh", "Inseoidh siad"], futureQA: { q: "An n-inseoidh?", pos: "Inseoidh", neg: "Ní inseoidh" } },
+  "Ith": { name: "Ith", trans: "To Eat", classification: "Irregular", past: ["D'ith mé", "D'ith tú", "D'ith sé", "D'ith sí", "D'itheamar", "D'ith sibh", "D'ith siad"], pastQA: { q: "Ar ith?", pos: "D'ith", neg: "Níor ith" }, present: ["Ithim", "Itheann tú", "Itheann sé", "Itheann sí", "Itheaimid", "Itheann sibh", "Itheann siad"], presentQA: { q: "An n-itheann?", pos: "Itheann", neg: "Ní itheann" }, future: ["Íosfaidh mé", "Íosfaidh tú", "Íosfaidh sé", "Íosfaidh sí", "Íosfaimid", "Íosfaidh sibh", "Íosfaidh siad"], futureQA: { q: "An n-íosfaidh?", pos: "Íosfaidh", neg: "Ní íosfaidh" } },
+  "Léigh": { name: "Léigh", trans: "To Read", classification: "Slender (Caol)", past: ["Léigh mé", "Léigh tú", "Léigh sé", "Léigh sí", "Léamar", "Léigh sibh", "Léigh siad"], pastQA: { q: "Ar léigh?", pos: "Léigh", neg: "Níor léigh" }, present: ["Léim", "Léann tú", "Léann sé", "Léann sí", "Léimid", "Léann sibh", "Léann siad"], presentQA: { q: "An léann?", pos: "Léann", neg: "Ní léann" }, future: ["Léifidh mé", "Léifidh tú", "Léifidh sé", "Léifidh sí", "Léifimid", "Léifidh sibh", "Léifidh siad"], futureQA: { q: "An léifidh?", pos: "Léifidh", neg: "Ní léifidh" } },
+  "Líon": { name: "Líon", trans: "To Fill", classification: "Broad (Leathan)", past: ["Líon mé", "Líon tú", "Líon sé", "Líon sí", "Líonamar", "Líon sibh", "Líon siad"], pastQA: { q: "Ar líon?", pos: "Líon", neg: "Níor líon" }, present: ["Líonaim", "Líonann tú", "Líonann sé", "Líonann sí", "Líonaimid", "Líonann sibh", "Líonann siad"], presentQA: { q: "An líonann?", pos: "Líonann", neg: "Ní líonann" }, future: ["Líonfaidh mé", "Líonfaidh tú", "Líonfaidh sé", "Líonfaidh sí", "Líonfaimid", "Líonfaidh sibh", "Líonfaidh siad"], futureQA: { q: "An líonfaidh?", pos: "Líonfaidh", neg: "Ní líonfaidh" } },
+  "Nigh": { name: "Nigh", trans: "To Wash", classification: "Slender (Caol)", past: ["Nigh mé", "Nigh tú", "Nigh sé", "Nigh sí", "Níomar", "Nigh sibh", "Nigh siad"], pastQA: { q: "Ar nigh?", pos: "Nigh", neg: "Níor nigh" }, present: ["Ním", "Níonn tú", "Níonn sé", "Níonn sí", "Nímid", "Níonn sibh", "Níonn siad"], presentQA: { q: "An níonn?", pos: "Níonn", neg: "Ní níonn" }, future: ["Nífidh mé", "Nífidh tú", "Nífidh sé", "Nífidh sí", "Nífimid", "Nífidh sibh", "Nífidh siad"], futureQA: { q: "An nífidh?", pos: "Nífidh", neg: "Ní nífidh" } },
+  "Ól": { name: "Ól", trans: "To Drink", classification: "Broad (Leathan)", past: ["D'ól mé", "D'ól tú", "D'ól sé", "D'ól sí", "D'ólamar", "D'ól sibh", "D'ól siad"], pastQA: { q: "Ar ól?", pos: "D'ól", neg: "Níor ól" }, present: ["Ólaim", "Ólann tú", "Ólann sé", "Ólann sí", "Ólaimid", "Ólann sibh", "Ólann siad"], presentQA: { q: "An n-ólann?", pos: "Ólann", neg: "Ní ólann" }, future: ["Ólfaidh mé", "Ólfaidh tú", "Ólfaidh sé", "Ólfaidh sí", "Ólfaimid", "Ólfaidh sibh", "Ólfaidh siad"], futureQA: { q: "An n-ólfaidh?", pos: "Ólfaidh", neg: "Ní ólfaidh" } },
+  "Oscail": { name: "Oscail", trans: "To Open", classification: "Broad (Leathan)", past: ["D'oscail mé", "D'oscail tú", "D'oscail sé", "D'oscail sí", "D'osclaíomar", "D'oscail sibh", "D'oscail siad"], pastQA: { q: "Ar oscail?", pos: "D'oscail", neg: "Níor oscail" }, present: ["Osclaím", "Osclaíonn tú", "Osclaíonn sé", "Osclaíonn sí", "Osclaímid", "Osclaíonn sibh", "Osclaíonn siad"], presentQA: { q: "An n-osclaíonn?", pos: "Osclaíonn", neg: "Ní osclaíonn" }, future: ["Osclóidh mé", "Osclóidh tú", "Osclóidh sé", "Osclóidh sí", "Osclóimid", "Osclóidh sibh", "Osclóidh siad"], futureQA: { q: "An n-osclóidh?", pos: "Osclóidh", neg: "Ní osclóidh" } },
+  "Rith": { name: "Rith", trans: "To Run", classification: "Slender (Caol)", past: ["Rith mé", "Rith tú", "Rith sé", "Rith sí", "Ritheamar", "Rith sibh", "Rith siad"], pastQA: { q: "Ar rith?", pos: "Rith", neg: "Níor rith" }, present: ["Rithim", "Ritheann tú", "Ritheann sé", "Ritheann sí", "Rithimid", "Ritheann sibh", "Ritheann siad"], presentQA: { q: "An rithann?", pos: "Ritheann", neg: "Ní ritheann" }, future: ["Rithfidh mé", "Rithfidh tú", "Rithfidh sé", "Rithfidh sí", "Rithfimid", "Rithfidh sibh", "Rithfidh siad"], futureQA: { q: "An rithfidh?", pos: "Rithfidh", neg: "Ní rithfidh" } },
+  "Scríobh": { name: "Scríobh", trans: "To Write", classification: "Slender (Caol)", past: ["Scríobh mé", "Scríobh tú", "Scríobh sé", "Scríobh sí", "Scríobhamar", "Scríobh sibh", "Scríobh siad"], pastQA: { q: "Ar scríobh?", pos: "Scríobh", neg: "Níor scríobh" }, present: ["Scríobhaim", "Scríobhann tú", "Scríobhann sé", "Scríobhann sí", "Scríobhaimid", "Scríobhann sibh", "Scríobhann siad"], presentQA: { q: "An scríobhann?", pos: "Scríobhann", neg: "Ní scríobhann" }, future: ["Scríobhfaidh mé", "Scríobhfaidh tú", "Scríobhfaidh sé", "Scríobhfaidh sí", "Scríobhfaimid", "Scríobhfaidh sibh", "Scríobhfaidh siad"], futureQA: { q: "An scríobhfaidh?", pos: "Scríobhfaidh", neg: "Ní scríobhfaidh" } },
+  "Siúil": { name: "Siúil", trans: "To Walk", classification: "Slender (Caol)", past: ["Shiúil mé", "Shiúil tú", "Shiúil sé", "Shiúil sí", "Shiúileamar", "Shiúil sibh", "Shiúil siad"], pastQA: { q: "Ar shiúil?", pos: "Shiúil", neg: "Níor shiúil" }, present: ["Siúilim", "Siúileann tú", "Siúileann sé", "Siúileann sí", "Siúilimid", "Siúileann sibh", "Siúileann siad"], presentQA: { q: "An siúileann?", pos: "Siúileann", neg: "Ní siúileann" }, future: ["Siúilfidh mé", "Siúilfidh tú", "Siúilfidh sé", "Siúilfidh sí", "Siúilfimid", "Siúilfidh sibh", "Siúilfidh siad"], futureQA: { q: "An siúilfidh?", pos: "Siúilfidh", neg: "Ní siúilfidh" } },
+  "Tabhair": { name: "Tabhair", trans: "To Give", classification: "Irregular", past: ["Thug mé", "Thug tú", "Thug sé", "Thug sí", "Thugamar", "Thug sibh", "Thug siad"], pastQA: { q: "Ar thug?", pos: "Thug", neg: "Níor thug" }, present: ["Tugaim", "Tugann tú", "Tugann sé", "Tugann sí", "Tugaimid", "Tugann sibh", "Tugann siad"], presentQA: { q: "An dtugann?", pos: "Tugann", neg: "Ní thugann" }, future: ["Tabharfaidh mé", "Tabharfaidh tú", "Tabharfaidh sé", "Tabharfaidh sí", "Tabharfaimid", "Tabharfaidh sibh", "Tabharfaidh siad"], futureQA: { q: "An dtabharfaidh?", pos: "Tabharfaidh", neg: "Ní thabharfaidh" } },
+  "Taispeáin": { name: "Taispeáin", trans: "To Show", classification: "Broad (Leathan)", past: ["Thaispeáin mé", "Thaispeáin tú", "Thaispeáin sé", "Thaispeáin sí", "Thaispeánamar", "Thaispeáin sibh", "Thaispeáin siad"], pastQA: { q: "Ar thaispeáin?", pos: "Thaispeáin", neg: "Níor thaispeáin" }, present: ["Taispeánaim", "Taispeánann tú", "Taispeánann sé", "Taispeánann sí", "Taispeánaimid", "Taispeánann sibh", "Taispeánann siad"], presentQA: { q: "An dtaispeánann?", pos: "Taispeánann", neg: "Ní thaispeánann" }, future: ["Taispeánfaidh mé", "Taispeánfaidh tú", "Taispeánfaidh sé", "Taispeánfaidh sí", "Taispeánfaimid", "Taispeánfaidh sibh", "Taispeánfaidh siad"], futureQA: { q: "An dtaispeánfaidh?", pos: "Taispeánfaidh", neg: "Ní thtaispeánfaidh" } },
+  "Tar": { name: "Tar", trans: "To Come", classification: "Irregular", past: ["Tháinig mé", "Tháinig tú", "Tháinig sé", "Tháinig sí", "Thángamar", "Tháinig sibh", "Tháinig siad"], pastQA: { q: "Ar tháinig?", pos: "Tháinig", neg: "Níor tháinig" }, present: ["Tagaim", "Tagann tú", "Tagann sé", "Tagann sí", "Tagaimid", "Tagann sibh", "Tagann siad"], presentQA: { q: "An dtagann?", pos: "Tagann", neg: "Ní thagann" }, future: ["Tiocfaidh mé", "Tiocfaidh tú", "Tiocfaidh sé", "Tiocfaidh sí", "Tiocfaimid", "Tiocfaidh sibh", "Tiocfaidh siad"], futureQA: { q: "An dtiocfaidh?", pos: "Tiocfaidh", neg: "Ní thiocfaidh" } },
+  "Tarraing": { name: "Tarraing", trans: "To Pull", classification: "Slender (Caol)", past: ["Tharraing mé", "Tharraing tú", "Tharraing sé", "Tharraing sí", "Tharraingeamar", "Tharraing sibh", "Tharraing siad"], pastQA: { q: "Ar tharraing?", pos: "Tharraing", neg: "Níor tharraing" }, present: ["Tarraingím", "Tarraingíonn tú", "Tarraingíonn sé", "Tarraingíonn sí", "Tarraingímid", "Tarraingíonn sibh", "Tarraingíonn siad"], presentQA: { q: "An dtarraingíonn?", pos: "Tarraingíonn", neg: "Ní tharraingíonn" }, future: ["Tarraingeoidh mé", "Tarraingeoidh tú", "Tarraingeoidh sé", "Tarraingeoidh sí", "Tarraingeoimid", "Tarraingeoidh sibh", "Tarraingeoidh siad"], futureQA: { q: "An dtarraingeoidh?", pos: "Tarraingeoidh", neg: "Ní tharraingeoidh" } },
+  "Téigh": { name: "Téigh", trans: "To Go", classification: "Irregular", past: ["Chuaigh mé", "Chuaigh tú", "Chuaigh sé", "Chuaigh sí", "Chuamar", "Chuaigh sibh", "Chuaigh siad"], pastQA: { q: "An ndeachaigh?", pos: "Chuaigh", neg: "Ní dheachaigh" }, present: ["Téim", "Téann tú", "Téann sé", "Téann sí", "Téimid", "Téann sibh", "Téann siad"], presentQA: { q: "An dtéann?", pos: "Téann", neg: "Ní théann" }, future: ["Rachaidh mé", "Rachaidh tú", "Rachaidh sé", "Rachaidh sí", "Rachaimid", "Rachaidh sibh", "Rachaidh siad"], futureQA: { q: "An rachaidh?", pos: "Rachaidh", neg: "Ní rachaidh" } },
+  "Tosaigh": { name: "Tosaigh", trans: "To Start", classification: "Slender (Caol)", past: ["Thosaigh mé", "Thosaigh tú", "Thosaigh sé", "Thosaigh sí", "Thosaíomar", "Thosaigh sibh", "Thosaigh siad"], pastQA: { q: "Ar thosaigh?", pos: "Thosaigh", neg: "Níor thosaigh" }, present: ["Tosaím", "Tosaíonn tú", "Tosaíonn sé", "Tosaíonn sí", "Tosaímid", "Tosaíonn sibh", "Tosaíonn siad"], presentQA: { q: "An dtosaíonn?", pos: "Tosaíonn", neg: "Ní thosaíonn" }, future: ["Tosóidh mé", "Tosóidh tú", "Tosóidh sé", "Tosóidh sí", "Tosóimid", "Tosóidh sibh", "Tosóidh siad"], futureQA: { q: "An dtosóidh?", pos: "Tosóidh", neg: "Ní thosóidh" } },
+  "Tóg": { name: "Tóg", trans: "To Take", classification: "Broad (Leathan)", past: ["Thóg mé", "Thóg tú", "Thóg sé", "Thóg sí", "Thógamar", "Thóg sibh", "Thóg siad"], pastQA: { q: "Ar thóg?", pos: "Thóg", neg: "Níor thóg" }, present: ["Tógaim", "Tógann tú", "Tógann sé", "Tógann sí", "Tógaimid", "Tógann sibh", "Tógann siad"], presentQA: { q: "An dtógann?", pos: "Tógann", neg: "Ní thógann" }, future: ["Tógfaidh mé", "Tógfaidh tú", "Tógfaidh sé", "Tógfaidh sí", "Tógfaimid", "Tógfaidh sibh", "Tógfaidh siad"], futureQA: { q: "An dtógfaidh?", pos: "Tógfaidh", neg: "Ní thógann" } }
+};
+
+const LITRIU_DATA = {
+  "1": [ { irish: "an chéad", english: "first" }, { irish: "an dara", english: "second" }, { irish: "an tríú", english: "third" }, { irish: "an ceathrú", english: "fourth" }, { irish: "an cúigiú", english: "fifth" }, { irish: "an séú", english: "sixth" }, { irish: "an seachtú", english: "seventh" }, { irish: "an t-ochtú", english: "eighth" }, { irish: "an naoú", english: "ninth" }, { irish: "an deichiú", english: "tenth" } ],
+  "2": [ { irish: "Dé Luain", english: "Monday" }, { irish: "Dé Mairt", english: "Tuesday" }, { irish: "Dé Céadaoin", english: "Wednesday" }, { irish: "Déardaoin", english: "Thursday" }, { irish: "Dé hAoine", english: "Friday" }, { irish: "Dé Sathairn", english: "Saturday" }, { irish: "Dé Domhnaigh", english: "Sunday" }, { irish: "dáta", english: "date" }, { irish: "dátaí", english: "dates" } ],
+  "3": [ { irish: "gránach", english: "porridge" }, { irish: "slisíní bagúin", english: "bacon slices" }, { irish: "bainne", english: "milk" }, { irish: "leite", english: "porridge" }, { irish: "arán donn", english: "brown bread" }, { irish: "ubh fhriochta", english: "fried egg" }, { irish: "subh", english: "jam" }, { irish: "tósta", english: "toast" }, { irish: "im", english: "butter" }, { irish: "sú oráiste", english: "orange juice" } ],
+  "4": [ { irish: "aon", english: "one" }, { irish: "dhá", english: "two" }, { irish: "trí", english: "three" }, { irish: "ceithre", english: "four" }, { irish: "cúig", english: "five" }, { irish: "sé", english: "six" }, { irish: "seacht", english: "seven" }, { irish: "ocht", english: "eight" }, { irish: "naoi", english: "nine" }, { irish: "deich", english: "ten" } ],
+  "5": [ { irish: "sailéad", english: "salad" }, { irish: "sicín", english: "chicken" }, { irish: "pónairí", english: "beans" }, { irish: "piseanna", english: "peas" }, { irish: "uaineoil", english: "lamb" }, { irish: "rís", english: "rice" }, { irish: "cabáiste", english: "cabbage" }, { irish: "ispíní", english: "sausages" }, { irish: "feoil", english: "meat" }, { irish: "cairéid", english: "carrots" } ],
+  "6": [ { irish: "seacláid", english: "chocolate" }, { irish: "brioscaí", english: "biscuits" }, { irish: "rian pháipéar", english: "greaseproof paper" }, { irish: "stán bácála", english: "baking tin" }, { irish: "spúnóg adhmaid", english: "wooden spoon" }, { irish: "babhla", english: "bowl" }, { irish: "cáca", english: "cake" }, { irish: "díolachán", english: "sale" }, { irish: "borróga", english: "burgers" }, { irish: "pióg úll", english: "apple pie" } ],
+  "7": [ { irish: "gadaí", english: "thief" }, { irish: "capall", english: "horse" }, { irish: "pluais", english: "cave" }, { irish: "broc", english: "badger" }, { irish: "sionnach", english: "fox" }, { irish: "asal", english: "donkey" }, { irish: "carraig", english: "rock" }, { irish: "feirmeoir", english: "farmer" }, { irish: "muin", english: "back" }, { irish: "málaí", english: "bags" } ],
+  "8": [ { irish: "Éire", english: "Ireland" }, { irish: "An Áise", english: "Asia" }, { irish: "An Afraic", english: "Africa" }, { irish: "tobar", english: "well" }, { irish: "abhainn", english: "river" }, { irish: "ospidéal", english: "hospital" }, { irish: "inneall níocháin", english: "washing machine" }, { irish: "cuisneoir", english: "fridge" }, { irish: "liamhás", english: "ham" } ],
+  "9": [ { irish: "cloigíní", english: "bells" }, { irish: "ribíní", english: "ribbons" }, { irish: "sióg", english: "fairy" }, { irish: "teach arán sinséir", english: "gingerbread house" }, { irish: "maisiúcháin", english: "decorations" }, { irish: "fear sinséir", english: "gingerbread man" }, { irish: "coinnle", english: "candles" }, { irish: "Coinneal na Nollag", english: "Christmas candle" }, { irish: "Fleasc na Nollag", english: "Christmas wreath" }, { irish: "soilse ildaithe", english: "fairy lights" } ],
+  "10": [ { irish: "tingeal", english: "fireplace" }, { irish: "teach", english: "house" }, { irish: "carr sleamhnáin", english: "sleigh" }, { irish: "Cártaí Nollag", english: "Christmas cards" }, { irish: "réinfhianna", english: "reindeer" }, { irish: "scáthán", english: "mirror" }, { irish: "cuileann", english: "holly" }, { irish: "Crann Nollag", english: "Christmas tree" }, { irish: "Mata", english: "Matt" }, { irish: "Stocaí Nollag", english: "Christmas stockings" } ]
+};
+
+const FRASAI_DATA = {
+  "1": [ { irish: "An itheann Niamh ispíní?", english: "Does Niamh eat sausages?" }, { irish: "An ólann Oisín bainne?", english: "Does Oisín drink milk?" }, { irish: "Cad a ólann tú ar maidin?", english: "What do you drink in the morning?" } ],
+  "2": [ { irish: "Cad atá agat don lón?", english: "What do you have for lunch?" }, { irish: "An maith leat am lón?", english: "Do you like lunchtime?" }, { irish: "An ndearna tú do cheapaire?", english: "Did you make your sandwich?" } ],
+  "3": [ { irish: "Cé a nigh an t-urlár?", english: "Who washed the floor?" }, { irish: "Céard atá ar an gcófra?", english: "What is on the cupboard?" }, { irish: "Cathain a nigh Oisín an t-urlár?", english: "When did Oisín wash the floor?" } ],
+  "4": [ { irish: "Cé acu is fearr leat, prátaí nó rís?", english: "Which do you prefer, potatoes or rice?" }, { irish: "Is fearr liom rís.", english: "I prefer rice." } ],
+  "5": [ { irish: "Ar thaitin an scéal leat? Cén fáth?", english: "Did you like the story? Why?" }, { irish: "Bhí capall taobh thiar den chrann.", english: "There was a horse behind the tree." }, { irish: "Bhí an t-asal os comhair an chrann.", english: "The donkey was in front of the tree." } ],
+  "6": [ { irish: "Tá tine ar lasadh sa tinteán.", english: "There is a fire burning in the fireplace." }, { irish: "Tá fleasc na Nollag ar an doras.", english: "There is a Christmas wreath on the door." }, { irish: "Tá Mamaí ag scríobh cártaí Nollag.", english: "Mammy is writing Christmas cards." } ],
+  "7": [ { irish: "An chéad oíche Nollag a bhí ann.", english: "It was the first Christmas night." }, { irish: "Rugadh an leanbh Íosa i lár na hoíche.", english: "Baby Jesus was born in the middle of the night." }, { irish: "Chuaigh na haoirí go dtí an stábla.", english: "The shepherds went to the stable." } ],
+  "8": [ { irish: "Cén séasúr a bhí ann?", english: "What season was it?" }, { irish: "Cad a d'ith na héin?", english: "What did the birds eat?" }, { irish: "Cén saghas aimsire a bhí ann?", english: "What kind of weather was it?" } ],
+  "9": [ { irish: "Chuir Mamaí fáilte roimhe.", english: "Mammy welcomed him." }, { irish: "Thug Oisín brioscaí dó.", english: "Oisín gave him biscuits." }, { irish: "Cé a d'oscail an dorais?", english: "Who opened the door?" } ],
+  "10": [ { irish: "Is breá liom bheith ag snámh.", english: "I love swimming." }, { irish: "An féidir leat tumadh?", english: "Can you dive?" }, { irish: "An dtéann Niamh ag snámh ar an Satharn?", english: "Does Niamh go swimming on Saturday?" } ]
+};
+
+const SPELLINGS_5TH = {
+  "15": { groups: [{ hint: "ur", words: ["burst", "return", "furnish", "curve", "burden", "murder", "turtle"] }, { hint: "ow", words: ["tower", "power", "powerful", "shower", "vowel", "allow", "allowed"] }, { hint: "ear", words: ["learn", "pearl", "research", "heard", "hearse", "earth", "earthquake"] }, { hint: "Key words", words: ["direct", "object", "distance", "substances", "details", "radio", "track"] }] },
+  "17": { groups: [{ hint: "air", words: ["repair", "unfair", "affair", "despair", "stairway", "failure", "curtail"] }, { hint: "ain", words: ["maintain", "painful", "rainbow", "maiden", "waiter", "strained", "brainwave"] }, { hint: "soft c/g", words: ["notice", "replace", "change", "orange", "manage", "fringe", "courage"] }, { hint: "Key words", words: ["trade", "provide", "forward", "express", "suppose", "cotton", "difficult"] }] },
+  "18": { groups: [{ hint: "ear (1)", words: ["spear", "tears", "hearing", "beard", "dearest", "nearby", "nearly"] }, { hint: "ear (2)", words: ["yearly", "fearless", "clearing", "earache", "gearbox", "shears", "teardrop"] }, { hint: "ear (3)", words: ["earned", "yearned", "swearing", "unbearable", "knitwear", "rainwear", "swimwear"] }, { hint: "Key words", words: ["raised", "electric", "similar", "particular", "stretched", "discovered", "prepared"] }] },
+  "19": { groups: [{ hint: "mixed", words: ["wasp", "nerve", "miles", "horse", "serve", "taste", "nails"] }, { hint: "ce/ge", words: ["service", "announce", "peaceful", "pronounce", "singe", "advantage", "outrage"] }, { hint: "ful", words: ["helpful", "careful", "painful", "useful", "successful", "powerful", "cheerful"] }, { hint: "Key words", words: ["secret", "urgent", "hidden", "covered", "invisible", "serious", "essential"] }] },
+  "20": { groups: [{ hint: "age", words: ["image", "manager", "message", "salvage", "postage", "religion", "tragedy"] }, { hint: "ly/y", words: ["lonely", "surely", "bravely", "nicely", "lovely", "ninety", "safety"] }, { hint: "ves", words: ["shelves", "calves", "loaves", "knives", "elves", "wolves", "thieves"] }, { hint: "Key words", words: ["mall", "allow", "million", "cells", "dollars", "actually", "syllables"] }] },
+  "21": { groups: [{ hint: "al", words: ["central", "annual", "festival", "material", "arrival", "usual", "natural"] }, { hint: "silent letters", words: ["listen", "guard", "wrong", "honest", "building", "answer", "guilty"] }, { hint: "or/ore", words: ["before", "explore", "inform", "record", "snore", "platform", "report"] }, { hint: "Key words", words: ["disagree", "disaster", "discount", "disgrace", "disgust", "discipline", "disapprove"] }] },
+  "22": { groups: [{ hint: "No Hint", words: ["panel", "slate", "organ", "north", "sword", "stale", "wolf"] }, { hint: "le", words: ["battle", "middle", "terrible", "possible", "skittle", "puzzle", "horrible"] }, { hint: "y→i rules", words: ["babies", "armies", "prettiest", "tidiest", "hurried", "busier", "emptiness"] }, { hint: "Key words", words: ["friend", "guard", "further", "happened", "government", "immediately", "glamorous"] }] },
+  "23": { groups: [{ hint: "irregular plurals", words: ["mice", "teeth", "people", "feet", "children", "geese", "cacti"] }, { hint: "ph", words: ["alphabet", "phantom", "elephant", "phrase", "dolphin", "pharmacy", "nephew"] }, { hint: "silent letters", words: ["limb", "crumb", "calm", "half", "sign", "writer", "whose"] }, { hint: "Key words", words: ["forty", "forward", "finally", "familiar", "ecstasy", "environment", "Fahrenheit"] }] },
+  "25": { groups: [{ hint: "ch as /k/", words: ["anchor", "chaos", "mechanic", "choir", "technical", "chemical", "character"] }, { hint: "ic", words: ["public", "specific", "republic", "plastic", "domestic", "classic", "Pacific"] }, { hint: "split e", words: ["polite", "salute", "remote", "extreme", "confuse", "divide", "lemonade"] }, { hint: "Key words", words: ["colleague", "committee", "completely", "curiosity", "dilemma", "disappear", "disappoint"] }] },
+  "26": { groups: [{ hint: "s plurals", words: ["zoos", "solos", "pianos", "banjos", "photos", "kangaroos", "stomachs"] }, { hint: "tion", words: ["action", "condition", "direction", "option", "addition", "production", "generation"] }, { hint: "le", words: ["little", "possible", "middle", "struggle", "bottle", "puzzle", "settle"] }, { hint: "Key words", words: ["until", "twelfth", "weather", "vacuum", "weird", "separate", "sergeant"] }] },
+  "27": { groups: [{ hint: "ph", words: ["autograph", "geography", "photography", "telephone", "paragraph", "microphone", "atmosphere"] }, { hint: "silent letters", words: ["palm", "wrong", "numb", "calf", "whole", "often", "scene"] }, { hint: "ery", words: ["artery", "battery", "lottery", "cemetery", "gallery", "slippery", "jewellery"] }, { hint: "Key words", words: ["rhyme", "rhythm", "schedule", "relevant", "referred", "reference", "restaurant"] }] },
+  "28": { groups: [{ hint: "No Hint", words: ["liar", "name", "scalp", "heart", "edit", "charm", "raced"] }, { hint: "tion", words: ["position", "suction", "attention", "information", "election", "relation", "mention"] }, { hint: "ary", words: ["library", "military", "dictionary", "voluntary", "ordinary", "estuary", "January"] }, { hint: "Key words", words: ["across", "bizarre", "achieve", "basically", "beginning", "appearance", "chauffeur"] }] },
+  "29": { groups: [{ hint: "ic", words: ["fabric", "logic", "panic", "dramatic", "electric", "clinic", "automatic"] }, { hint: "le", words: ["people", "example", "available", "trouble", "article", "vehicle", "ankle"] }, { hint: "ous", words: ["nervous", "famous", "generous", "dangerous", "curious", "various", "furious"] }, { hint: "Key words", words: ["occasion", "occurred", "necessary", "knowledge", "interrupt", "noticeable", "incidentally"] }] },
+  "30": { groups: [{ hint: "tion", words: ["education", "question", "situation", "operation", "solution", "collection", "caution"] }, { hint: "ough", words: ["cough", "enough", "rough", "toughest", "bought", "although", "ploughed"] }, { hint: "drop e + ing", words: ["freezing", "arrived", "exciting", "reversed", "deciding", "skated", "inquiring"] }, { hint: "Key words", words: ["receive", "receipt", "recommend", "publicly", "privilege", "pronunciation", "questionnaire"] }] },
+  "31": { groups: [{ hint: "silent letters", words: ["thumb", "sword", "listen", "plumber", "knock", "scent", "answer"] }, { hint: "sion", words: ["collision", "decision", "invasion", "erosion", "confusion", "occasion", "television"] }, { hint: "or", words: ["visitor", "selector", "operator", "calculator", "instructor", "solicitor", "governor"] }, { hint: "Key words", words: ["occasionally", "pastime", "perseverance", "possession", "precede", "principal", "principle"] }] }
+};
+
+const SPELLINGS_3RD = {
+  "17": { groups: [{ hint: "long i (i)", words: ["iron", "item", "idea", "idol", "icon"] }, { hint: "long i (i)", words: ["child", "final", "pilot", "silent", "spider"] }, { hint: "long i (y)", words: ["cry", "deny", "apply", "reply", "multiply"] }, { hint: "Key words", words: ["sky", "front", "along", "green", "done"] }] },
+  "18": { groups: [{ hint: "i_e", words: ["shine", "invite", "stripe", "wife", "write"] }, { hint: "ie", words: ["tie", "die", "cries", "fries", "spies"] }, { hint: "ui", words: ["quiet", "guide", "guise", "disguise", "inquire"] }, { hint: "Key words", words: ["true", "since", "force", "dance", "sentence"] }] },
+  "19": { groups: [{ hint: "y as long i", words: ["cycle", "hype", "type", "rhyme", "style"] }, { hint: "igh", words: ["night", "sight", "bright", "fright", "delight"] }, { hint: "silent letters", words: ["bye", "eye", "sign", "design", "resign"] }, { hint: "Key words", words: ["blue", "window", "children", "problem", "correct"] }] },
+  "20": { groups: [{ hint: "homophones", words: ["weak", "week", "to", "too", "two"] }, { hint: "homophones", words: ["sail", "sale", "there", "their", "they're"] }, { hint: "homophones", words: ["cent", "sent", "scent", "pain", "pane"] }, { hint: "Key words", words: ["bell", "strong", "school", "hundred", "through"] }] },
+  "21": { groups: [{ hint: "silent b", words: ["climb", "comb", "debt", "doubt", "thumb"] }, { hint: "silent g", words: ["gnaw", "high", "light", "reign", "gnome"] }, { hint: "silent h", words: ["choir", "hour", "honour", "honest", "ghost"] }, { hint: "Key words", words: ["answer", "wrote", "clothes", "brown", "finally"] }] },
+  "22": { groups: [{ hint: "al", words: ["animal", "capital", "hospital", "medal", "alone"] }, { hint: "el", words: ["cruel", "novel", "panel", "towel", "travel"] }, { hint: "il", words: ["fossil", "council", "stencil", "pupil", "pencil"] }, { hint: "Key words", words: ["until", "itself", "value", "change", "different"] }] },
+  "23": { groups: [{ hint: "or", words: ["doctor", "author", "solicitor", "tailor", "sailor"] }, { hint: "on", words: ["horizon", "abandon", "prison", "lesson", "season"] }, { hint: "oy", words: ["enjoy", "annoy", "loyal", "employ", "voyage"] }, { hint: "Key words", words: ["round", "draw", "catch", "horse", "women"] }] },
+  "25": { groups: [{ hint: "long e (e)", words: ["evil", "equal", "even", "evening", "eclipse"] }, { hint: "e_e", words: ["athlete", "delete", "here", "these", "theme"] }, { hint: "y as long e", words: ["angry", "dreary", "weary", "family", "twenty"] }, { hint: "Key words", words: ["often", "grass", "clear", "length", "heavy"] }] },
+  "26": { groups: [{ hint: "ea", words: ["jeans", "dream", "leave", "please", "teach"] }, { hint: "ee", words: ["agree", "bee", "bleed", "coffee", "speech"] }, { hint: "ey", words: ["monkey", "turkey", "honey", "valley", "chimney"] }, { hint: "Key words", words: ["key", "among", "forest", "summer", "winter"] }] },
+  "27": { groups: [{ hint: "long e (i)", words: ["ski", "suite", "unique", "clique", "spaghetti"] }, { hint: "ie", words: ["believe", "chief", "field", "niece", "relief"] }, { hint: "ei", words: ["ceiling", "deceive", "perceive", "receive", "receipt"] }, { hint: "Key words", words: ["ever", "else", "fruit", "glass", "coast"] }] },
+  "28": { groups: [{ hint: "au", words: ["aunt", "audio", "because", "fault", "haunt"] }, { hint: "air", words: ["airport", "chair", "fairy", "repair", "despair"] }, { hint: "are", words: ["stare", "glare", "scare", "share", "aware"] }, { hint: "Key words", words: ["warm", "money", "space", "covered", "radio"] }] },
+  "29": { groups: [{ hint: "double + le", words: ["apple", "cattle", "kettle", "little", "paddle"] }, { hint: "cle", words: ["uncle", "circle", "muscle", "cycle", "miracle"] }, { hint: "ple", words: ["purple", "couple", "simple", "people", "example"] }, { hint: "Key words", words: ["early", "leave", "world", "track", "dimple"] }] },
+  "30": { groups: [{ hint: "ex-", words: ["exit", "expel", "exceed", "expect", "explain"] }, { hint: "ful", words: ["helpful", "awful", "useful", "wishful", "careful"] }, { hint: "ful", words: ["beautiful", "merciful", "dutiful", "pitiful", "plentiful"] }, { hint: "Key words", words: ["idea", "example", "behind", "important", "joined"] }] },
+  "31": { groups: [{ hint: "super-", words: ["superb", "superman", "superhero", "superstar", "supermarket"] }, { hint: "ly", words: ["friendly", "likely", "really", "kindly", "weekly"] }, { hint: "ily", words: ["easily", "heavily", "readily", "happily", "steadily"] }, { hint: "Key words", words: ["slowly", "quickly", "carefully", "usually", "every"] }] }
+};
+
+// --- LOGIC ---
+let activeClass = '3rd';
+let mathsType = 'multiply';
+let selectedTables = [];
+
+function init() {
+  populateWeeks();
+  populateVerbs();
+  populateExtras();
+  renderTablesGrid();
+}
+
+function setClass(cls) {
+  activeClass = cls;
+  document.getElementById('btn3rd').classList.toggle('active', cls === '3rd');
+  document.getElementById('btn5th').classList.toggle('active', cls === '5th');
+  
+  const display = cls === '5th' ? 'block' : 'none';
+  document.getElementById('litriuSection').style.display = display;
+  document.getElementById('frasaiSection').style.display = display;
+
+  selectedTables = [];
+  populateWeeks();
+  renderTablesGrid();
+  renderSelectedTables();
+  hideSheet();
+}
+
+function setMathsType(type) {
+  mathsType = type;
+  document.getElementById('btnMultiply').classList.toggle('active', type === 'multiply');
+  document.getElementById('btnDivide').classList.toggle('active', type === 'divide');
+  renderTablesGrid();
+}
+
+function populateWeeks() {
+  const select = document.getElementById('weekSelect');
+  const spellings = activeClass === '5th' ? SPELLINGS_5TH : SPELLINGS_3RD;
+  select.innerHTML = '<option value="">Choose a week...</option>';
+  Object.keys(spellings).sort((a,b) => Number(a) - Number(b)).forEach(w => {
+    select.innerHTML += `<option value="${w}">Week ${w}</option>`;
+  });
+}
+
+function populateVerbs() {
+  const select = document.getElementById('verbSelect');
+  select.innerHTML = '<option value="">Choose a verb...</option>';
+  Object.keys(VERB_LIBRARY).sort().forEach(v => {
+    select.innerHTML += `<option value="${v}">${v} (${VERB_LIBRARY[v].trans})</option>`;
+  });
+}
+
+function populateExtras() {
+    const litSelect = document.getElementById('litriuSelect');
+    litSelect.innerHTML = '<option value="">Choose a week...</option>';
+    Object.keys(LITRIU_DATA).sort((a,b) => Number(a) - Number(b)).forEach(w => {
+        litSelect.innerHTML += `<option value="${w}">Week ${w}</option>`;
+    });
+
+    const fraSelect = document.getElementById('frasaiSelect');
+    fraSelect.innerHTML = '<option value="">Choose a week...</option>';
+    Object.keys(FRASAI_DATA).sort((a,b) => Number(a) - Number(b)).forEach(w => {
+        fraSelect.innerHTML += `<option value="${w}">Week ${w}</option>`;
+    });
+}
+
+function renderTablesGrid() {
+  const grid = document.getElementById('tablesGrid');
+  const nums = [2,3,4,5,6,7,8,9,10,11,12];
+  grid.innerHTML = nums.map(n => {
+    const isActive = selectedTables.find(t => t.number === n && t.type === mathsType);
+    return `<button class="table-btn ${isActive ? 'active' : ''}" onclick="toggleTable(${n})">${n}${mathsType === 'multiply' ? '×' : '÷'}</button>`;
+  }).join('');
+}
+
+function toggleTable(n) {
+  const existing = selectedTables.findIndex(t => t.number === n && t.type === mathsType);
+  if (existing >= 0) {
+    selectedTables.splice(existing, 1);
+  } else {
+    const limit = activeClass === '3rd' ? 10 : 12;
+    const results = [];
+    for (let i = 0; i <= limit; i++) {
+      results.push(mathsType === 'multiply' ? `${i} × ${n} = ${i*n}` : `${i*n} ÷ ${n} = ${i}`);
+    }
+    selectedTables.push({ number: n, type: mathsType, results });
+  }
+  renderTablesGrid();
+  renderSelectedTables();
+}
+
+function renderSelectedTables() {
+  const container = document.getElementById('selectedTables');
+  container.innerHTML = selectedTables.map((t, i) => 
+    `<div class="selected-tag">${t.number}${t.type === 'multiply' ? '×' : '÷'}<button onclick="removeTable(${i})">×</button></div>`
+  ).join('');
+}
+
+function removeTable(i) {
+  selectedTables.splice(i, 1);
+  renderTablesGrid();
+  renderSelectedTables();
+}
+
+function hideSheet() {
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('sheetPreview').classList.remove('visible');
+  document.getElementById('sheetPrint').classList.remove('visible');
+  document.getElementById('printBtn').style.display = 'none';
+}
+
+function generateSheet() {
+  const weekNum = document.getElementById('weekSelect').value;
+  const verbKey = document.getElementById('verbSelect').value;
+  const litriuKey = document.getElementById('litriuSelect').value;
+  const frasaiKey = document.getElementById('frasaiSelect').value;
+  
+  const spellings = activeClass === '5th' ? SPELLINGS_5TH : SPELLINGS_3RD;
+  const weekData = spellings[weekNum];
+  const verbData = VERB_LIBRARY[verbKey];
+  const litriuData = LITRIU_DATA[litriuKey];
+  const frasaiData = FRASAI_DATA[frasaiKey];
+  
+  const html = buildSheetHTML(weekNum, weekData, verbData, selectedTables, litriuData, frasaiData);
+  
+  document.getElementById('sheetPreview').innerHTML = html;
+  document.getElementById('sheetPrint').innerHTML = html;
+  
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('sheetPreview').classList.add('visible');
+  document.getElementById('sheetPrint').classList.add('visible');
+  document.getElementById('printBtn').style.display = 'flex';
+}
+
+function buildSheetHTML(weekNum, weekData, verbData, tables, litriuData, frasaiData) {
+  let html = `
+    <div class="sheet-header">
+      <h1>${activeClass} Class Study Sheet</h1>
+      ${weekNum ? `<div class="week">Week ${weekNum}</div>` : ''}
+    </div>
+  `;
+  
+  // Spellings
+  if (weekData && weekData.groups) {
+    html += `
+      <div class="section">
+        <div class="section-header"><h3>English Spellings</h3></div>
+        <div class="spellings-grid">
+          ${weekData.groups.map(g => `
+            <div class="spelling-box">
+              <div class="hint">${g.hint}</div>
+              <div class="words">${g.words.map(w => `<div>${w}</div>`).join('')}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  // Verb
+  if (verbData) {
+    if (activeClass === '3rd') {
+      html += `
+        <div class="section">
+          <div class="section-header"><h3>Irish Verb</h3><span class="badge">${verbData.classification}</span></div>
+          <div class="verb-card verb-3rd">
+            <div class="verb-header">${verbData.name} — ${verbData.trans}</div>
+            <div class="verb-body">
+              <div class="tense-label">Aimsir Chaite (Past Tense)</div>
+              <div class="conjugations">${verbData.past.slice(0,7).map(v => `<div>${v}</div>`).join('')}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      const tenses = [
+        { label: 'Aimsir Chaite', data: verbData.past, qa: verbData.pastQA },
+        { label: 'Aimsir Láithreach', data: verbData.present, qa: verbData.presentQA },
+        { label: 'Aimsir Fháistineach', data: verbData.future, qa: verbData.futureQA }
+      ];
+      html += `
+        <div class="section">
+          <div class="section-header"><h3>Irish Verb</h3><span class="badge">${verbData.classification}</span></div>
+          <div class="verb-card verb-5th">
+            <div class="verb-header">${verbData.name} — ${verbData.trans}</div>
+            <div class="verb-body">
+              ${tenses.map(t => `
+                <div class="tense-col">
+                  <div class="tense-label">${t.label}</div>
+                  <div class="conjugations">${t.data.map(v => `<div>${v}</div>`).join('')}</div>
+                  ${t.qa ? `
+                    <div class="qa-box">
+                      <div><span class="label">Ceisteanna:</span> <span class="q">${t.qa.q}</span></div>
+                      <div><span class="label">✅:</span> <span>${t.qa.pos}</span></div>
+                      <div><span class="label">❌:</span> <span>${t.qa.neg}</span></div>
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Litriu and Frasai Wrapper
+  let litriuHtml = '';
+  let frasaiHtml = '';
+
+  if (litriuData && activeClass === '5th') {
+      litriuHtml = `
+        <div class="translation-box">
+            <div class="translation-header">
+                <div>Irish (Litriú)</div>
+                <div>English</div>
+            </div>
+            ${litriuData.map(l => `
+                <div class="translation-row">
+                    <div class="irish">${l.irish}</div>
+                    <div>${l.english}</div>
+                </div>
+            `).join('')}
+        </div>
+      `;
+  }
+
+  if (frasaiData && activeClass === '5th') {
+      frasaiHtml = `
+        <div class="translation-box">
+            <div class="translation-header">
+                <div>Irish (Frásaí)</div>
+                <div>English</div>
+            </div>
+            ${frasaiData.map(l => `
+                <div class="translation-row">
+                    <div class="irish">${l.irish}</div>
+                    <div>${l.english}</div>
+                </div>
+            `).join('')}
+        </div>
+      `;
+  }
+
+  if (litriuHtml || frasaiHtml) {
+      html += `<div class="section"><div class="section-header"><h3>Irish Extra</h3></div><div class="extras-grid">`;
+      if(litriuHtml) html += litriuHtml;
+      if(frasaiHtml) html += frasaiHtml;
+      html += `</div></div>`;
+  }
+  
+  // Maths
+  if (tables && tables.length > 0) {
+    html += `
+      <div class="section">
+        <div class="section-header"><h3>Maths Tables</h3></div>
+        <div class="maths-grid">
+          ${tables.map(t => `
+            <div class="maths-box">
+              <div class="maths-header">${t.number} ${t.type === 'multiply' ? 'Times' : 'Divide'}</div>
+              <div class="equations">${t.results.map(r => `<div>${r}</div>`).join('')}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  return html;
+}
+
+// Start
+init();
+</script>
