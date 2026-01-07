@@ -139,6 +139,11 @@
       .sheet-root.sheet-3rd .maths-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
       .sheet-root.sheet-3rd .maths-box .equations div { font-size: 12px; }
 
+      /* Slightly tighter layout for 5th class to avoid overflow */
+      .sheet-root.sheet-5th { width: 100%; padding: 8mm; gap: 10mm; }
+      .sheet-root.sheet-5th .section { margin-bottom: 10px; }
+      .sheet-root.sheet-5th .section-header { margin-bottom: 6px; padding-bottom: 3px; }
+
       /* 5mm margin to ensure it prints close to edge but safely */
       @page { size: A4; margin: 5mm; }
       
