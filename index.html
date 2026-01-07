@@ -140,16 +140,18 @@
       .sheet-root.sheet-3rd .maths-box .equations div { font-size: 12px; }
 
       /* Compact layout for 5th class to keep to one page */
-      .sheet-root.sheet-5th { width: 100%; padding: 6mm; gap: 6mm; }
-      .sheet-root.sheet-5th .sheet-header { padding-bottom: 6px; margin-bottom: 8px; }
-      .sheet-root.sheet-5th .section { margin-bottom: 6px; }
-      .sheet-root.sheet-5th .section-header { margin-bottom: 3px; padding-bottom: 2px; }
-      .sheet-root.sheet-5th .spellings-grid { gap: 6px; }
-      .sheet-root.sheet-5th .translation-row div { padding: 3px 6px; }
-      .sheet-root.sheet-5th .maths-grid { gap: 6px; }
-      .sheet-root.sheet-5th .maths-box .maths-header { padding: 3px; }
-      .sheet-root.sheet-5th .maths-box .equations { padding: 6px; }
-      .sheet-root.sheet-5th .maths-box .equations div { font-size: 10px; }
+      .sheet-root.sheet-5th { width: 100%; padding: 5mm; gap: 4mm; }
+      .sheet-root.sheet-5th .sheet-header { padding-bottom: 4px; margin-bottom: 6px; }
+      .sheet-root.sheet-5th .sheet-header h1 { font-size: 22px; }
+      .sheet-root.sheet-5th .section { margin-bottom: 4px; }
+      .sheet-root.sheet-5th .section-header { margin-bottom: 2px; padding-bottom: 2px; }
+      .sheet-root.sheet-5th .section-header h3 { font-size: 13px; line-height: 1.2; }
+      .sheet-root.sheet-5th .spellings-grid { gap: 4px; }
+      .sheet-root.sheet-5th .translation-row div { padding: 2px 5px; }
+      .sheet-root.sheet-5th .maths-grid { gap: 4px; }
+      .sheet-root.sheet-5th .maths-box .maths-header { padding: 2px; }
+      .sheet-root.sheet-5th .maths-box .equations { padding: 5px; }
+      .sheet-root.sheet-5th .maths-box .equations div { font-size: 9.5px; }
 
       /* Margins: 0.2mm top/bottom, 5mm left/right */
       @page { size: A4; margin: 0.2mm 5mm; }
@@ -633,7 +635,7 @@ function buildSheetHTML(weekNum, weekData, verbData, tables, litriuData, frasaiD
   }
 
   if (litriuHtml || frasaiHtml) {
-      html += `<div class="section"><div class="section-header"><h3>Irish Extra</h3></div><div class="extras-grid">`;
+      html += `<div class="section"><div class="section-header"><h3>Litriú & Frásaí</h3></div><div class="extras-grid">`;
       if(litriuHtml) html += litriuHtml;
       if(frasaiHtml) html += frasaiHtml;
       html += `</div></div>`;
