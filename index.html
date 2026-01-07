@@ -139,10 +139,16 @@
       .sheet-root.sheet-3rd .maths-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
       .sheet-root.sheet-3rd .maths-box .equations div { font-size: 12px; }
 
-      /* Slightly tighter layout for 5th class to avoid overflow */
-      .sheet-root.sheet-5th { width: 100%; padding: 8mm; gap: 10mm; }
-      .sheet-root.sheet-5th .section { margin-bottom: 10px; }
-      .sheet-root.sheet-5th .section-header { margin-bottom: 6px; padding-bottom: 3px; }
+      /* Compact layout for 5th class to keep to one page */
+      .sheet-root.sheet-5th { width: 100%; padding: 6mm; gap: 8mm; }
+      .sheet-root.sheet-5th .section { margin-bottom: 8px; }
+      .sheet-root.sheet-5th .section-header { margin-bottom: 4px; padding-bottom: 3px; }
+      .sheet-root.sheet-5th .spellings-grid { gap: 6px; }
+      .sheet-root.sheet-5th .translation-row div { padding: 3px 6px; }
+      .sheet-root.sheet-5th .maths-grid { gap: 6px; }
+      .sheet-root.sheet-5th .maths-box .maths-header { padding: 3px; }
+      .sheet-root.sheet-5th .maths-box .equations { padding: 6px; }
+      .sheet-root.sheet-5th .maths-box .equations div { font-size: 10px; }
 
       /* 5mm margin to ensure it prints close to edge but safely */
       @page { size: A4; margin: 5mm; }
