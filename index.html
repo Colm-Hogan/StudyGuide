@@ -70,6 +70,7 @@
     
     /* --- SHEET STYLES (Shared) --- */
     .sheet { display: none; }
+    .sheet-root { display: flex; flex-direction: column; gap: 1.5rem; }
     .sheet.visible { display: block; }
     .sheet-header { text-align: center; border-bottom: 4px double #e0e7ff; padding-bottom: 1.5rem; margin-bottom: 2rem; }
     .sheet-header h1 { font-size: 1.75rem; font-weight: 900; text-transform: uppercase; color: var(--primary-dark); }
@@ -126,6 +127,17 @@
       .no-print { display: none !important; }
       
       .sheet { display: block !important; width: 100%; margin: 0 auto; padding: 0; }
+      .sheet-root { width: 100%; min-height: calc(297mm - 10mm); padding: 12mm; gap: 12mm; }
+      .sheet-root.sheet-3rd { gap: 14mm; }
+      .sheet-root.sheet-3rd .sheet-header h1 { font-size: 26px; }
+      .sheet-root.sheet-3rd .section-header h3 { font-size: 15px; }
+      .sheet-root.sheet-3rd .spellings-grid { gap: 12px; }
+      .sheet-root.sheet-3rd .spelling-box .words div { font-size: 13px; }
+      .sheet-root.sheet-3rd .verb-3rd .verb-body { padding: 14px; }
+      .sheet-root.sheet-3rd .verb-3rd .conjugations div { font-size: 14px; }
+      .sheet-root.sheet-3rd .maths-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      .sheet-root.sheet-3rd .maths-box .equations div { font-size: 12px; }
+
       /* 5mm margin to ensure it prints close to edge but safely */
       @page { size: A4; margin: 5mm; }
       
@@ -496,11 +508,13 @@ function generateSheet() {
 }
 
 function buildSheetHTML(weekNum, weekData, verbData, tables, litriuData, frasaiData) {
+  const sheetClass = activeClass === '3rd' ? 'sheet-3rd' : 'sheet-5th';
   let html = `
-    <div class="sheet-header">
-      <h1>${activeClass} Class Study Sheet</h1>
-      ${weekNum ? `<div class="week">Week ${weekNum}</div>` : ''}
-    </div>
+    <div class="sheet-root ${sheetClass}">
+      <div class="sheet-header">
+        <h1>${activeClass} Class Study Sheet</h1>
+        ${weekNum ? `<div class="week">Week ${weekNum}</div>` : ''}
+      </div>
   `;
   
   // Spellings
@@ -629,6 +643,7 @@ function buildSheetHTML(weekNum, weekData, verbData, tables, litriuData, frasaiD
     `;
   }
   
+  html += `</div>`;
   return html;
 }
 
