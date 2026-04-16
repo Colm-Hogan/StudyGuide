@@ -16,6 +16,8 @@
     
     /* --- SCREEN STYLES --- */
     .app-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    .secret-watermark { display: none; }
     
     header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 1.25rem; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
     .logo { display: flex; align-items: center; gap: 0.75rem; }
@@ -125,6 +127,18 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       body { background: white !important; margin: 0; padding: 0; }
       .no-print { display: none !important; }
+      
+      /* THE SECRET WATERMARK */
+      .secret-watermark {
+        display: block !important;
+        position: fixed; 
+        bottom: 2mm; 
+        right: 5mm; 
+        font-size: 6px; 
+        color: #cbd5e1; /* Faint, sneaky gray */
+        font-family: monospace;
+        z-index: 9999;
+      }
       
       .sheet { display: block !important; width: 100%; margin: 0 auto; padding: 0; }
 
@@ -277,6 +291,8 @@
   </div>
   
   <div class="sheet" id="sheetPrint"></div>
+
+  <div class="secret-watermark">Holly Hogan's Dad made this</div>
 
 <script>
 // --- DATA DEFINITIONS ---
